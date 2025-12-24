@@ -60,13 +60,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: |
-            frontend/dist/**
-            backend/dist/**
-            backend/package.json
+          source: deploy-project-aws
           target: /home/ubuntu/deploy-project-aws
           strip_components: 1
           debug: true
+
 
       # ---------- RESTART BACKEND ----------
       - name: Restart backend with PM2
