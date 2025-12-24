@@ -41,11 +41,17 @@ jobs:
           npm run build
 
       # ---------- DEBUG ----------
-      - name: Debug workspace files
+      - name: 🔎 DEBUG – Show entire workspace
         run: |
-          ls -la
-          ls -la frontend/dist || echo "frontend/dist missing"
-          ls -la backend/dist || echo "backend/dist missing"
+          echo "===== CURRENT DIR ====="
+          pwd
+
+          echo "===== ROOT ====="
+          find . -maxdepth 3 -type d
+
+          echo "===== FILES ====="
+          find . -maxdepth 3 -type f | head -n 50
+
 
       # ---------- COPY TO EC2 ----------
       - name: Copy files to EC2
