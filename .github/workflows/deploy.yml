@@ -54,16 +54,17 @@ jobs:
 
 
       # ---------- COPY TO EC2 ----------
-      - name: Copy files to EC2
-        uses: appleboy/scp-action@v0.1.7
+      - name: Sync files to EC2 using rsync
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: deploy-project-aws
-          target: /home/ubuntu/deploy-project-aws
-          strip_components: 1
-          debug: true
+          script: |
+            sudo rsync -av --delete \
+              $GITHUB_WORKSPACE/ \
+              /home/ubuntu/deploy-project-aws/
+
 
 
       # ---------- RESTART BACKEND ----------
