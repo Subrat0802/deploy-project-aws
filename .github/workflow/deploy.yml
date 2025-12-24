@@ -1,0 +1,69 @@
+name: Deploy Frontend & Backend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm install
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
+
+      # ---------- COPY TO EC2 ----------
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: |
+            frontend/dist
+            backend/dist
+            backend/package.json
+            backend/prisma
+          target: ${{ secrets.EC2_PATH }}
+
+      # ---------- DEPLOY ON EC2 ----------
+      - name: Restart backend with PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/deploy-project-aws/backend
+            npm install --production
+            pm2 delete backend || true
+            pm2 start dist/index.js --name backend
+            pm2 save
