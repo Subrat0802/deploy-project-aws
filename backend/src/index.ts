@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin:"http://localhost:3000",
+  origin:"http://localhost:5173",
   credentials: true
 }))
 
@@ -205,21 +205,24 @@ app.post("/todo", isUser, async (req: Request, res: Response) => {
   }
 });
 
-app.get("/todos", isUser, async (req:Request, res: Response) => {
+//remove isUser temp
+app.get("/todos", async (req:Request, res: Response) => {
   try {
-    const id = req.user?.id;
-    if (!id) {
-      return res.status(500).json({
-        message: "server configration error",
-        success: false,
-      });
-    }
+    // const id = req.user?.id;
+    // if (!id) {
+    //   return res.status(500).json({
+    //     message: "server configration error",
+    //     success: false,
+    //   });
+    // }
 
-    const response = await prisma.todo.findMany({
-      where: {
-        userId: id,
-      },
-    });
+    const response = await prisma.todo.findMany(
+      // {
+      //   where:{
+      //     userId: id
+      //   }
+      // }
+    );
     if (!response) {
       return res.status(404).json({
         message: "Unable to find user todos",
