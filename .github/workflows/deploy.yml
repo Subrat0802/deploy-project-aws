@@ -16,9 +16,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 23
+          node-version: 20
 
-
+      # ---------- FRONTEND ----------
       - name: Install frontend deps
         run: |
           cd frontend
@@ -29,7 +29,7 @@ jobs:
           cd frontend
           npm run build
 
-
+      # ---------- BACKEND ----------
       - name: Install backend deps
         run: |
           cd backend
@@ -39,6 +39,13 @@ jobs:
         run: |
           cd backend
           npm run build
+
+      # ---------- DEBUG ----------
+      - name: Debug workspace files
+        run: |
+          ls -la
+          ls -la frontend/dist || echo "frontend/dist missing"
+          ls -la backend/dist || echo "backend/dist missing"
 
       # ---------- COPY TO EC2 ----------
       - name: Copy files to EC2
@@ -51,18 +58,16 @@ jobs:
             frontend/dist/**
             backend/dist/**
             backend/package.json
-            backend/prisma/**
           target: /home/ubuntu/deploy-project-aws
           strip_components: 1
           debug: true
 
-
-      # ---------- DEPLOY ON EC2 ----------
+      # ---------- RESTART BACKEND ----------
       - name: Restart backend with PM2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/deploy-project-aws/backend
