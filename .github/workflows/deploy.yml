@@ -45,14 +45,17 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: |
-            frontend/dist
-            backend/dist
+            frontend/dist/**
+            backend/dist/**
             backend/package.json
-            backend/prisma
-          target: ${{ secrets.EC2_PATH }}
+            backend/prisma/**
+          target: /home/ubuntu/deploy-project-aws
+          strip_components: 1
+          debug: true
+
 
       # ---------- DEPLOY ON EC2 ----------
       - name: Restart backend with PM2
