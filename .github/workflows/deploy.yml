@@ -40,7 +40,6 @@ jobs:
           cd backend
           npm run build
 
-          
       # ---------- COPY TO EC2 ----------
       - name: Copy files to EC2
         uses: appleboy/scp-action@v0.1.7
